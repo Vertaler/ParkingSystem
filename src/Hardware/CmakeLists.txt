@@ -1,0 +1,5 @@
+add_subdirectory(Barrier)
+add_subdirectory(Clock)
+add_subdirectory(Printer)
+add_subdirectory(Scanner)
+add_subdirectory(Sensor)

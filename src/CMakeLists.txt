@@ -1,2 +1,8 @@
-add_subdirectory(sample_library)
-add_subdirectory(ftxui_sample)
+add_subdirectory(App)
+add_subdirectory(BusinessLogic)
+add_subdirectory(Common)
+add_subdirectory(Domain)
+add_subdirectory(Hardware)
+
+
+
