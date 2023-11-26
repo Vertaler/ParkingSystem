@@ -1,6 +1,7 @@
 set(ACCOUNT_SERVICE_SRC 
     Private/AccountServiceImpl.cpp
     Private/AccountServiceImpl.h
+    Private/Factory.cpp
 )
 
 add_library(AccountService ${ACCOUNT_SERVICE_SRC})

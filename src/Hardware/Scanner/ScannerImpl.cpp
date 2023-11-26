@@ -11,7 +11,7 @@ public:
   [[nodiscard]] Cmn::Result<ScannedData> scan() const override
   {
     ScannedData result;
-    _scanningStream >> result.data;
+    std::getline(_scanningStream, result.data);
     return Cmn::Result<ScannedData>{ result };
   }
 

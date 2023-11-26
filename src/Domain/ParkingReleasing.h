@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Domain/ParkingReservation.h"
 #include "Domain/Time.h"
+#include "Domain/Vehicle.h"
 
 namespace Vertaler::ParkingSystem::Domain
 {
 
 struct ReleasingRequest
 {
-  ReservationTicket ticket;
+  VehicleNumber vehicleNumber;
   TimePoint departureTime;
 };
 

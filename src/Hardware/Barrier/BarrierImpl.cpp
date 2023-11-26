@@ -11,7 +11,7 @@ namespace
   class BarrierImpl : public Barrier
   {
   public:
-    Cmn::Result<void> passCar() override
+    Cmn::Result<void> passVehicle() override
     {
       return {};
     }

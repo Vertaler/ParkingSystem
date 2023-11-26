@@ -1,22 +1,21 @@
 #pragma once
 
-#include "Domain/CarInfo.h"
 #include "Domain/ParkingSpaceInfo.h"
 #include "Domain/Time.h"
+#include "Domain/Vehicle.h"
 
 namespace Vertaler::ParkingSystem::Domain
 {
 
 struct ReservationRequest
 {
-  CarInfo carInfo;
-  ParkingSpaceInfo desiredParkingSpace;
+  Vehicle vehicle;
   TimePoint arrivalTime;
 };
 
 struct ReservationTicket
 {
-  CarNumber number;
+  VehicleNumber number;
   TimePoint arrivalTime;
 };
 

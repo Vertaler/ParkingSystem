@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <concepts>
 #include <optional>
 #include <type_traits>
@@ -38,7 +39,7 @@ public:
 
   [[nodiscard]] const T &getResult() const
   {
-    assert(_res.hasValue());
+    assert(_res.has_value());
     return *_res;
   }
 
@@ -55,9 +56,11 @@ private:
 template<> class Result<void>
 {
 public:
-  void getResult() const
+  void getResult() const {}
+  [[nodiscard]] void *getError() const
   {
-    return;
+    // TODO: Add support of errors
+    return nullptr;
   }
 };
 

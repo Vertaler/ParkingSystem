@@ -5,11 +5,16 @@
 namespace Vertaler::ParkingSystem::Domain
 {
 
-class CarNumber
+class VehicleNumber
 {
-  explicit CarNumber(std::string data) : _data(std::move(data)) {}
+public:
+  VehicleNumber() = default;
+  explicit VehicleNumber(std::string data) : _data(std::move(data)) {}
 
-  std::string asString() const { return _data; }
+  std::string asString() const
+  {
+    return _data;
+  }
 
 private:
   // temporary solution
@@ -17,9 +22,9 @@ private:
   std::string _data;
 };
 
-struct CarInfo
+struct Vehicle
 {
-  CarNumber number;
+  VehicleNumber number;
 };
 
 }// namespace Vertaler::ParkingSystem::Domain

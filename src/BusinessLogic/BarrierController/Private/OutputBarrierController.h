@@ -7,10 +7,12 @@ namespace Vertaler::ParkingSystem::BL::BarrierController
 
 class OutputBarrierController final : public BarrierControllerBase
 {
+public:
+  using BarrierControllerBase::BarrierControllerBase;
+
 protected:
-  // Handle ticket as ReservationTicket
-  Cmn::Result<bool> shouldPassCar() override;
-  Cmn::Result<bool> preparePrintingInfo() override;
+  [[nodiscard]] virtual Cmn::Result<PassVehicleResult> tryPassVehicle(const Domain::Vehicle &vehicle,
+    const Domain::TimePoint &time) const override;
 };
 
 }// namespace Vertaler::ParkingSystem::BL::BarrierController

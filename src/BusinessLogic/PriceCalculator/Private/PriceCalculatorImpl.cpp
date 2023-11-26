@@ -10,10 +10,10 @@ namespace
   constexpr size_t PricePerSecond = 10;
 }
 
-Cmn::Result<Domain::Money> PriceCalculatorImpl::calculateParkingPrice(const Domain::ReleasingRequest &req) const
+Cmn::Result<Domain::Money> PriceCalculatorImpl::calculateParkingPrice(const Domain::ReservationTicket &ticket,
+  const Domain::TimePoint &departureTime) const
 {
-  const auto &departureTime = req.departureTime;
-  const auto &arrivalTime = req.ticket.arrivalTime;
+  const auto &arrivalTime = ticket.arrivalTime;
   const auto parkingDuration = (departureTime - arrivalTime);
 
   using namespace std::chrono;

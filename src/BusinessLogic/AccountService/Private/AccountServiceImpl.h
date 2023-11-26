@@ -12,10 +12,6 @@ class AccountServiceImpl final : public Interface
 {
 public:
   explicit AccountServiceImpl(const PriceCalculator::Interface &priceCalculator);
-  AccountServiceImpl &operator=(const AccountServiceImpl &) = delete;
-  AccountServiceImpl(const AccountServiceImpl &) = delete;
-  AccountServiceImpl &operator=(AccountServiceImpl &&) = delete;
-  AccountServiceImpl(AccountServiceImpl &&) = delete;
 
   Cmn::Result<Domain::ReservationTicket> reserveParkingSpace(const Domain::ReservationRequest &req) override;
   Cmn::Result<Domain::PaymentTicket> releaseParkingSpace(const Domain::ReleasingRequest &req) override;
@@ -23,7 +19,7 @@ public:
 private:
   const PriceCalculator::Interface &_priceCalculator;
 
-  std::unordered_map<std::string, Domain::ReservationTicket> m_storage;
+  std::unordered_map<std::string, Domain::ReservationTicket> _storage;
 };
 
 }// namespace Vertaler::ParkingSystem::BL::AccountService
