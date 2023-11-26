@@ -10,7 +10,7 @@ namespace Vertaler::ParkingSystem::BL::BarrierController
 class Interface
 {
 public:
-  virtual ~BarrierController() = default;
+  virtual ~Interface() = default;
   virtual Cmn::Result<void> handleCar(const Domain::CarInfo &) const = 0;
 };
 

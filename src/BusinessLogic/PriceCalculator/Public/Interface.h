@@ -13,7 +13,7 @@ class Interface
 {
 public:
   virtual ~Interface() = default;
-  Cmn::Result<Money> calculateParkinPrice(const Domain::ReleasingRequest &req) const = 0;
-}
+  virtual Cmn::Result<Domain::Money> calculateParkingPrice(const Domain::ReleasingRequest &req) const = 0;
+};
 
 }// namespace Vertaler::ParkingSystem::BL::PriceCalculator

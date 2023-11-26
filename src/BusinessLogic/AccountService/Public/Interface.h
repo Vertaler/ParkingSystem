@@ -13,7 +13,8 @@ class Interface
 {
 public:
   virtual ~Interface() = default;
-  Cmn::Result<Domain::ReservationTicket> reserveParkingSpace(const Domain::ReservationRequest &req);
-  Cmn::Result<Domain::PaymentTicket> releaseParkingSpace(const Domain::ReleasingRequest &req);
+  virtual Cmn::Result<Domain::ReservationTicket> reserveParkingSpace(const Domain::ReservationRequest &req) = 0;
+  virtual Cmn::Result<Domain::PaymentTicket> releaseParkingSpace(const Domain::ReleasingRequest &req) = 0;
+};
 
 }// namespace Vertaler::ParkingSystem::BL::AccountService

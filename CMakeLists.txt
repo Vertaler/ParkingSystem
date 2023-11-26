@@ -68,12 +68,6 @@ endif()
 # Adding the tests:
 include(CTest)
 
-if(BUILD_TESTING)
-  message(AUTHOR_WARNING "Building Tests. Be sure to check out test/constexpr_tests.cpp for constexpr testing")
-  add_subdirectory(test)
-endif()
-
-
 if(ParkingSystem_BUILD_FUZZ_TESTS)
   message(AUTHOR_WARNING "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
   if (NOT ParkingSystem_ENABLE_ADDRESS_SANITIZER AND NOT ParkingSystem_ENABLE_THREAD_SANITIZER)
@@ -92,7 +86,7 @@ if(MSVC)
 endif()
 
 # set the startup project for the "play" button in MSVC
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT intro)
+# TODO: Fix set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT intro)
 
 if(CMAKE_SKIP_INSTALL_RULES)
   return()
@@ -104,7 +98,6 @@ include(cmake/PackageProject.cmake)
 # we know we want to ship
 ParkingSystem_package_project(
   TARGETS
-  intro
   ParkingSystem_options
   ParkingSystem_warnings
   # FIXME: this does not work! CK

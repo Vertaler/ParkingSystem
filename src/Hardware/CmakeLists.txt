@@ -1,5 +1,7 @@
+add_library(Hardware)
+target_include_directories(Hardware PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
 add_subdirectory(Barrier)
 add_subdirectory(Clock)
 add_subdirectory(Printer)
 add_subdirectory(Scanner)
-add_subdirectory(Sensor)

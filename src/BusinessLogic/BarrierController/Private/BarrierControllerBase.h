@@ -11,7 +11,8 @@ public:
   Cmn::Result<void> handleCar(const Domain::CarInfo &) const override;
 
 protected:
-  virtual void handleScaningResult() = 0;
+  virtual Cmn::Result<bool> shouldPassCar() = 0;
+  virtual Cmn::Result<bool> preparePrintingInfo() = 0;
 };
 
 }// namespace Vertaler::ParkingSystem::BL::BarrierController

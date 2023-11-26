@@ -11,6 +11,7 @@ struct ReservationRequest
 {
   CarInfo carInfo;
   ParkingSpaceInfo desiredParkingSpace;
+  TimePoint arrivalTime;
 };
 
 struct ReservationTicket

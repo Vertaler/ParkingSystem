@@ -9,9 +9,8 @@ class Barrier
 {
 public:
   virtual ~Barrier() = default;
-  // open/or close
-  virtual Result<void> toggle() = 0;
-  virtual Result<bool> isOpen() const = 0;
-}
+  // open, wait until car passed and close
+  virtual Cmn::Result<void> passCar() = 0;
+};
 
 }// namespace Vertaler::ParkingSystem::Hardware

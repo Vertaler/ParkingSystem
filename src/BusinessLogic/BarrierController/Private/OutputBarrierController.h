@@ -5,11 +5,12 @@
 namespace Vertaler::ParkingSystem::BL::BarrierController
 {
 
-class OutputBarrierController : public BarrierControllerBase
+class OutputBarrierController final : public BarrierControllerBase
 {
 protected:
   // Handle ticket as ReservationTicket
-  Cmn::Result<void> handleScaningResult() override;
+  Cmn::Result<bool> shouldPassCar() override;
+  Cmn::Result<bool> preparePrintingInfo() override;
 };
 
 }// namespace Vertaler::ParkingSystem::BL::BarrierController

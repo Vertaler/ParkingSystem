@@ -2,6 +2,8 @@
 
 #include "Common/Result.h"
 
+#include <string>
+
 namespace Vertaler::ParkingSystem::Hardware
 {
 
@@ -10,10 +12,11 @@ class Scanner
 public:
   struct ScannedData
   {
+    std::string data;
   };
 
   virtual ~Scanner() = default;
-  virtual Cmn::Result<ScannedData> scan() const = 0
+  [[nodiscard]] virtual Cmn::Result<ScannedData> scan() const = 0;
 };
 
 }// namespace Vertaler::ParkingSystem::Hardware
