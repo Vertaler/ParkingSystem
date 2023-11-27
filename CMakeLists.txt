@@ -57,6 +57,14 @@ add_library(ParkingSystem::ParkingSystem_warnings ALIAS ParkingSystem_warnings)
 # configure files based on CMake configuration options
 add_subdirectory(configured_files)
 
+find_package(Catch2 REQUIRED)
+add_executable(ParkingTests)
+target_link_libraries(ParkingTests 
+  PRIVATE 
+  Catch2::Catch2WithMain
+  PriceCalculator
+)
+target_include_directories(ParkingTests PRIVATE src)
 # Adding the src:
 add_subdirectory(src)
 

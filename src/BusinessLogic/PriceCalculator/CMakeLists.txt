@@ -6,3 +6,5 @@ set(PRICE_CALCULATOR_SRC
 
 add_library(PriceCalculator ${PRICE_CALCULATOR_SRC})
 target_include_directories(PriceCalculator PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+target_sources(ParkingTests PRIVATE Tests/Test.cpp)
