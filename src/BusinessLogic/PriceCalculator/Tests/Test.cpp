@@ -23,6 +23,7 @@ TEST_CASE("Price calculated w/o errors", "[PriceCalculator]")
   auto res = priceCalculator->calculateParkingPrice(ticket, departureTime);
 
   REQUIRE(res.getError() == nullptr);
+  REQUIRE(res.getResult().amount == 100);
 }
 
 }// namespace Vertaler::ParkingSystem::BL::PriceCalculator::Tests

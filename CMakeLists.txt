@@ -62,6 +62,7 @@ add_executable(ParkingTests)
 target_link_libraries(ParkingTests 
   PRIVATE 
   Catch2::Catch2WithMain
+  AccountService
   PriceCalculator
 )
 target_include_directories(ParkingTests PRIVATE src)
