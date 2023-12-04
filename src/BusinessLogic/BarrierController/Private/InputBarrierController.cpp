@@ -18,8 +18,9 @@ auto InputBarrierController::tryPassVehicle(const Domain::Vehicle &vehicle, cons
   }
 
   const auto &reservationTicket = res.getResult();
-  const auto printMessage = fmt::format(
-    "ReservationTicket[VehicleNumber: |Time: {}]", reservationTicket.number.asString(), reservationTicket.arrivalTime);
+  const auto printMessage = fmt::format("ReservationTicket[VehicleNumber: {}|Time: {}]",
+    reservationTicket.number.asString(),
+    reservationTicket.arrivalTime);
   return PassVehicleResult{ true, { printMessage } };
 }
 
