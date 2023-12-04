@@ -4,5 +4,6 @@ target_link_libraries(ParkingSystem
   BarrierController
   Hardware
   PriceCalculator
+  scn
 )
 target_include_directories(ParkingSystem PRIVATE ${CMAKE_SOURCE_DIR}/src)
