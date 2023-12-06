@@ -2,9 +2,13 @@
 #include "BusinessLogic/AccountService/Public/Interface.h"
 #include "BusinessLogic/BarrierController/Public/Factory.h"
 #include "BusinessLogic/BarrierController/Public/Interface.h"
+#include "BusinessLogic/PaymentService/Public/Factory.h"
+#include "BusinessLogic/PaymentService/Public/Interface.h"
 #include "BusinessLogic/PriceCalculator/Public/Factory.h"
 #include "BusinessLogic/PriceCalculator/Public/Interface.h"
 
+
+#include "Domain/PaymentTicket.h"
 #include "Hardware/Facade.h"
 
 #include "Hardware/Barrier/Barrier.h"
@@ -25,12 +29,30 @@
 using namespace Vertaler;
 using namespace Vertaler::ParkingSystem;
 
-bool readLine(std::string &line)
+using BarrierControllers = std::vector<std::unique_ptr<BL::BarrierController::Interface>>;
+
+
+void handleVehicle(const BarrierControllers &controllers, const std::string &barrierType)
 {
-  std::cout << "Write IN <number of input barrier> to emulate incoming vehicle  or OUT  <number of output barrier> to "
-               "emulate outgoing vehicle"
-            << std::endl;
-  return !!std::getline(std::cin, line);
+  size_t barrierNumber{};
+  if (!scn::prompt("Please prompt barrier number\n", "{}", barrierNumber))
+  {
+    return;
+  }
+  if (barrierNumber >= controllers.size())
+  {
+    std::cerr << "There are only " << controllers.size() << barrierType << " barriers" << std::endl;
+    return;
+  }
+
+  const auto &controller = controllers.at(barrierNumber);
+
+  std::cout << "Handling " << barrierType << " vehicle. Please prompt vehicle number" << std::endl;
+  const auto res = controller->handleVehicle();
+  if (const auto *err = res.getError(); err != nullptr)
+  {
+    std::cerr << "Some error on " << barrierType << " vehicle" << std::endl;
+  }
 }
 
 int main(int argc, const char **argv)
@@ -49,9 +71,9 @@ try
 
   const auto hardware = Hardware::createFacade(std::cout, std::cin);
   const auto priceCalculator = BL::PriceCalculator::create();
-  const auto accountService = BL::AccountService::create(*priceCalculator);
+  const auto paymentService = BL::PaymentService::create();
+  const auto accountService = BL::AccountService::create(*priceCalculator, *paymentService);
 
-  using BarrierControllers = std::vector<std::unique_ptr<BL::BarrierController::Interface>>;
   BarrierControllers inputBarrierControllers;
   BarrierControllers outputBarrierControllers;
 
@@ -68,39 +90,29 @@ try
   }
 
   const char *promptMessage =
-    "Write IN <number of input barrier> to emulate incoming vehicle  or OUT  <number of output barrier> to emulate "
-    "outgoing vehicle ";
+    "Write IN  to emulate incoming vehicle,\n"
+    "OUT  to emulate outgoing vehicle\n"
+    "PAY to emulate payment.\n";
   std::string command{};
-  size_t barrierNumber{};
-  while (scn::prompt(promptMessage, "{} {}", command, barrierNumber))
+  while (scn::prompt(promptMessage, "{}", command))
   {
     if (command == "OUT")
     {
-      if (barrierNumber >= outputBarriersCount)
-      {
-        std::cerr << "There are only " << outputBarriersCount << " output barriers" << std::endl;
-        continue;
-      }
-
-      std::cout << "Handling outgoing vehicle. Please prompt vehicle number" << std::endl;
-      const auto res = outputBarrierControllers[barrierNumber]->handleVehicle();
-      if (const auto *err = res.getError(); err != nullptr)
-      {
-        std::cerr << "Some error on outgoing vehicle" << std::endl;
-      }
+      handleVehicle(outputBarrierControllers, "output");
     } else if (command == "IN")
     {
-      if (barrierNumber >= inputBarriersCount)
+      handleVehicle(inputBarrierControllers, "input");
+    } else if (command == "PAY")
+    {
+      Domain::PaymentTicketID paymentTicketID;
+      if (!scn::prompt("Please provide payment ticket ID\n", "{}", paymentTicketID))
       {
-        std::cerr << "There are only " << inputBarriersCount << " input barriers" << std::endl;
         continue;
       }
-
-      std::cout << "Handling incoming vehicle. Please prompt vehicle number" << std::endl;
-      const auto res = inputBarrierControllers[barrierNumber]->handleVehicle();
-      if (const auto *err = res.getError(); err != nullptr)
+      const auto res = paymentService->pay(paymentTicketID);
+      if (!res.getError())
       {
-        std::cerr << "Some error on incoming vehicle" << std::endl;
+        std::cout << "Successfully paid for ticket " << paymentTicketID << std::endl;
       }
     } else
     {

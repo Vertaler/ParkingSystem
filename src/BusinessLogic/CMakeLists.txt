@@ -1,3 +1,4 @@
 add_subdirectory(AccountService)
 add_subdirectory(BarrierController)
 add_subdirectory(PriceCalculator)
+add_subdirectory(PaymentService)
