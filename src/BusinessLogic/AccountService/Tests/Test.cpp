@@ -96,7 +96,7 @@ TEST_CASE("Basic account service tests", "[AccountService]")
     Domain::ReservationRequest request{ vehicle, time };
     auto res = accountService->reserveParkingSpace(request);
     REQUIRE(res.getError() == nullptr);
-    REQUIRE(res.getResult().number.asString() == vehicleNumber.asString());
+    REQUIRE(res.getResult().number == vehicleNumber);
     REQUIRE(paymentServiceMock.getRegisterCallCount() == 1);
   }
 

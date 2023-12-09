@@ -1,24 +1,16 @@
 #pragma once
 
+#include "Concepts.h"
+
 #include <cassert>
-#include <concepts>
 #include <optional>
-#include <type_traits>
 
 namespace Vertaler::Cmn
 {
 
 
-// TODO: On my mac STD headers points to OSX platform SDK
-// Which has quite old version and doesn't have concept implementation
-// So we workaround it with
-namespace Detail
-{
-  template<class T, class... Args>
-  concept ConstructibleFrom = std::is_nothrow_destructible_v<T> && std::is_constructible_v<T, Args...>;
-}
-
-template<typename T> class Result
+template<typename T>
+class Result
 {
 public:
   // TODO: Just temporary. Need remove it.
@@ -31,7 +23,7 @@ public:
   // NOLINTEND(hicpp-explicit-conversions)
 
   template<typename... Args>
-  requires Detail::ConstructibleFrom<T, Args...>
+  requires ConstructibleFrom<T, Args...>
   explicit Result(Args &&...args)
   {
     _res.emplace(std::forward<Args>(args)...);
@@ -53,7 +45,8 @@ private:
   std::optional<T> _res;
 };
 
-template<> class Result<void>
+template<>
+class Result<void>
 {
 public:
   void getResult() const {}

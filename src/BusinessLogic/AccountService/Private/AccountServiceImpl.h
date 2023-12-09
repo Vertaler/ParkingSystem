@@ -5,6 +5,7 @@
 #include "BusinessLogic/PriceCalculator/Public/Interface.h"
 #include "Domain/ParkingReleasing.h"
 #include "Domain/PaymentTicket.h"
+#include "Domain/Vehicle.h"
 
 #include <unordered_map>
 
@@ -24,8 +25,8 @@ private:
   const PriceCalculator::Interface &_priceCalculator;
   PaymentService::Interface &_paymentService;
 
-  std::unordered_map<std::string, Domain::ReservationTicket> _storage;
-  std::unordered_map<std::string, Domain::PaymentTicketID> _paymentTicketsIDs;
+  std::unordered_map<Domain::VehicleNumber, Domain::ReservationTicket> _storage;
+  std::unordered_map<Domain::VehicleNumber, Domain::PaymentTicketID> _paymentTicketsIDs;
 };
 
 }// namespace Vertaler::ParkingSystem::BL::AccountService

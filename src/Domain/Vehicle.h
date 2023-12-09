@@ -1,6 +1,9 @@
 #pragma once
 
+#include <functional>
+#include <ostream>
 #include <string>
+
 
 namespace Vertaler::ParkingSystem::Domain
 {
@@ -11,10 +14,21 @@ public:
   VehicleNumber() = default;
   explicit VehicleNumber(std::string data) : _data(std::move(data)) {}
 
-  std::string asString() const
+  [[nodiscard]] std::string asString() const
   {
     return _data;
   }
+
+  [[nodiscard]] friend auto operator==(const VehicleNumber &lhs, const VehicleNumber &rhs) noexcept
+  {
+    return rhs._data == lhs._data;
+  }
+  friend std::ostream &operator<<(std::ostream &out, const VehicleNumber &vehicleNumber)
+  {
+    return out << vehicleNumber._data;
+  }
+
+  friend std::hash<VehicleNumber>;
 
 private:
   // temporary solution
@@ -28,3 +42,16 @@ struct Vehicle
 };
 
 }// namespace Vertaler::ParkingSystem::Domain
+
+namespace std
+{
+
+template<> struct std::hash<Vertaler::ParkingSystem::Domain::VehicleNumber>
+{
+  std::size_t operator()(const Vertaler::ParkingSystem::Domain::VehicleNumber &number) const noexcept
+  {
+    return std::hash<std::string>{}(number._data);
+  }
+};
+
+}// namespace std

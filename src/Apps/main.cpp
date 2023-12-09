@@ -110,7 +110,7 @@ try
         continue;
       }
       const auto res = paymentService->pay(paymentTicketID);
-      if (!res.getError())
+      if (res.getError() == nullptr)
       {
         std::cout << "Successfully paid for ticket " << paymentTicketID << std::endl;
       }

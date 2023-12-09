@@ -1,4 +1,5 @@
 #include "InputBarrierController.h"
+
 #include "Domain/ParkingReservation.h"
 
 #include <fmt/chrono.h>
