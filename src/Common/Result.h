@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Concepts.h"
+#include "Error.h"
 
 #include <cassert>
+#include <memory>
 #include <optional>
+#include <type_traits>
+#include <variant>
 
 namespace Vertaler::Cmn
 {
@@ -14,7 +18,6 @@ class Result
 {
 public:
   // TODO: Just temporary. Need remove it.
-  Result() = default;
 
   // Don't make explicit because we want implicit conversion
   // NOLINTBEGIN(hicpp-explicit-conversions)
@@ -26,35 +29,62 @@ public:
   requires ConstructibleFrom<T, Args...>
   explicit Result(Args &&...args)
   {
-    _res.emplace(std::forward<Args>(args)...);
+    _res.template emplace<T>(std::forward<Args>(args)...);
   }
 
-  [[nodiscard]] const T &getResult() const
+  Result(Error err)
   {
-    assert(_res.has_value());
-    return *_res;
+    _res.template emplace<Error>(std::move(err));
   }
 
-  [[nodiscard]] void *getError() const
+  [[nodiscard]] T getResult() const
   {
-    // TODO: Add support of errors
-    return nullptr;
+    assert(std::holds_alternative<T>(_res));
+    return std::get<T>(_res);
+  }
+
+  [[nodiscard]] const Error *getError() const noexcept
+  {
+    return std::get_if<Error>(&_res);
+  }
+
+  [[nodiscard]] Error *getError() noexcept
+  {
+    return std::get_if<Error>(&_res);
   }
 
 private:
-  std::optional<T> _res;
+  std::variant<T, Error> _res;
 };
 
 template<>
 class Result<void>
 {
 public:
-  void getResult() const {}
-  [[nodiscard]] void *getError() const
+  Result() = default;
+  Result(Error err)
   {
-    // TODO: Add support of errors
+    _err.emplace(std::move(err));
+  }
+
+  [[nodiscard]] Error *getError() noexcept
+  {
+    if (_err.has_value())
+    {
+      return &_err.value();
+    }
+
     return nullptr;
   }
+
+  [[nodiscard]] const Error *getError() const noexcept
+  {
+    return const_cast<Result *>(this)->getError();
+  }
+
+
+private:
+  std::optional<Error> _err;
 };
 
 

@@ -25,6 +25,8 @@ project(
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
+# TODO: Get rid of hardcoded path
+link_directories("/usr/local/opt/llvm@17/lib/c++")
 
 ParkingSystem_setup_options()
 
@@ -62,6 +64,7 @@ add_executable(ParkingTests)
 target_link_libraries(ParkingTests 
   PRIVATE 
   Catch2::Catch2WithMain
+  FakeIt::FakeIt-catch
   AccountService
   PriceCalculator
 )

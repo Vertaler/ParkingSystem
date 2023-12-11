@@ -1,4 +1,7 @@
 #include "AccountServiceImpl.h"
+
+#include "BusinessLogic/AccountService/Public/Errors.h"
+
 #include "Domain/ParkingReleasing.h"
 #include "Domain/PaymentTicket.h"
 
@@ -42,7 +45,7 @@ Cmn::Result<Domain::ReleasingResponse> AccountServiceImpl::releaseParkingSpace(c
     return Domain::ReleasingResponse{ Domain::ReleasingStatus::PaymentRequired,
       Domain::PaymentTicket{ price.getResult(), paymentTicketID } };
   }
-  return {};
+  return Cmn::Error(Errc::ReservationNotFound);
 }
 
 
