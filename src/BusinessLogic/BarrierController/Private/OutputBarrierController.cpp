@@ -18,9 +18,19 @@ auto OutputBarrierController::tryPassVehicle(const Domain::Vehicle &vehicle, con
     return PassVehicleResult{ false, { "Couldn't pass car" } };
   }
 
-  const auto &paymentTicket = res.getResult();
-  const auto printMessage = fmt::format("Parking price: {}", paymentTicket.parkingPrice.amount);
-  return PassVehicleResult{ true, { printMessage } };
+  const auto &releasingResponse = res.getResult();
+  if (releasingResponse.status == Domain::ReleasingStatus::OK)
+  {
+    return PassVehicleResult{ true, { "Bon Voyage!" } };
+  } else if (releasingResponse.status == Domain::ReleasingStatus::PaymentRequired)
+  {
+    const auto &paymentTicket = *releasingResponse.paymentTicket;
+    const auto printMessage = fmt::format(
+      "Payment required! PaymentTickedID: {}. Parking price: {}", paymentTicket.ID, paymentTicket.parkingPrice.amount);
+    return PassVehicleResult{ false, { printMessage } };
+  }
+
+  assert(false && "This branch must be unreachable, probably not all relesing statuses are handled");
 }
 
 }// namespace Vertaler::ParkingSystem::BL::BarrierController

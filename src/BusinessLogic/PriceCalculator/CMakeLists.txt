@@ -1,7 +1,9 @@
 set(PRICE_CALCULATOR_SRC 
+    Private/Factory.cpp
     Private/PriceCalculatorImpl.cpp
     Private/PriceCalculatorImpl.h
-    Private/Factory.cpp
+    Private/Rates.cpp
+    Private/Rates.h
 )
 
 add_library(PriceCalculator ${PRICE_CALCULATOR_SRC})
