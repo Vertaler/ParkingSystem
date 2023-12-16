@@ -18,8 +18,8 @@ TEST_CASE("Price calculated w/o errors", "[PriceCalculator]")
   using namespace std::chrono_literals;
 
   const auto arrivalTime = system_clock::now();
-  const auto departureTime = arrivalTime + 10s;
-  Domain::ReservationTicket ticket{ Domain::VehicleNumber{ "123" }, arrivalTime };
+  const auto departureTime = arrivalTime + 4h;
+  const Domain::ReservationTicket ticket{ Domain::VehicleNumber{ "123" }, arrivalTime };
   auto res = priceCalculator->calculateParkingPrice(ticket, departureTime);
 
   REQUIRE(res.getError() == nullptr);
