@@ -36,7 +36,8 @@ class Error
 {
 public:
   template<Enum ErrType>
-  explicit Error(ErrType enumErrCode) : _errCode(makeErrorCode(enumErrCode))
+  explicit Error(ErrType enumErrCode, std::source_location sourceLocation = std::source_location::current())
+    : _errCode(makeErrorCode(enumErrCode)), _sourceLocation(std::move(sourceLocation))
   {}
 
   [[nodiscard]] const Error *getNested() const noexcept
@@ -48,6 +49,11 @@ public:
   [[nodiscard]] bool is(ErrType enumErrCode) const noexcept
   {
     return _errCode == makeErrorCode(enumErrCode);
+  }
+
+  const std::source_location &sourceLocation() const noexcept
+  {
+    return _sourceLocation;
   }
 
   Error &withNested(Error err) noexcept
@@ -62,10 +68,11 @@ public:
     return *this;
   }
 
+
 private:
   ErrorCode _errCode;
   std::string _message;
-  // std::source_location _sourceLocation;
+  std::source_location _sourceLocation;
   std::unique_ptr<Error> _nested;// Can't use optional recursively
 };
 

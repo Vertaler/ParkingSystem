@@ -18,6 +18,7 @@ class Result
 {
 public:
   // TODO: Just temporary. Need remove it.
+  Result() = default;
 
   // Don't make explicit because we want implicit conversion
   // NOLINTBEGIN(hicpp-explicit-conversions)
@@ -26,7 +27,7 @@ public:
   // NOLINTEND(hicpp-explicit-conversions)
 
   template<typename... Args>
-  requires ConstructibleFrom<T, Args...>
+    requires ConstructibleFrom<T, Args...>
   explicit Result(Args &&...args)
   {
     _res.template emplace<T>(std::forward<Args>(args)...);

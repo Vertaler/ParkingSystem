@@ -36,9 +36,17 @@ private:
   std::string _data;
 };
 
+enum class VehicleServiceCategory
+{
+  General,
+  Police,
+  Ambulance
+};
+
 struct Vehicle
 {
   VehicleNumber number;
+  VehicleServiceCategory serviceCategory{ VehicleServiceCategory::General };
 };
 
 }// namespace Vertaler::ParkingSystem::Domain
@@ -46,7 +54,8 @@ struct Vehicle
 namespace std
 {
 
-template<> struct std::hash<Vertaler::ParkingSystem::Domain::VehicleNumber>
+template<>
+struct std::hash<Vertaler::ParkingSystem::Domain::VehicleNumber>
 {
   std::size_t operator()(const Vertaler::ParkingSystem::Domain::VehicleNumber &number) const noexcept
   {

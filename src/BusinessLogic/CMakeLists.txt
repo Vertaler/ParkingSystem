@@ -1,4 +1,6 @@
 add_subdirectory(AccountService)
 add_subdirectory(BarrierController)
+add_subdirectory(EntryExitController)
 add_subdirectory(PriceCalculator)
 add_subdirectory(PaymentService)
+add_subdirectory(VehicleCatalog)
