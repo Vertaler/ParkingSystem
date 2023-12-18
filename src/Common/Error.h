@@ -2,6 +2,7 @@
 
 #include "Concepts.h"
 
+#include <memory>
 #include <optional>
 #include <source_location>
 #include <string>
@@ -56,9 +57,9 @@ public:
     return _sourceLocation;
   }
 
-  Error &withNested(Error err) noexcept
+  Error &withNested(Error &&err) noexcept
   {
-    _nested.reset(new Error(std::move(err)));
+    _nested = std::make_unique<Error>(std::move(err));
     return *this;
   }
 
@@ -75,5 +76,10 @@ private:
   std::source_location _sourceLocation;
   std::unique_ptr<Error> _nested;// Can't use optional recursively
 };
+
+#define CMN_NESTED_ERR(errCode, nested)                             \
+  {                                                                 \
+    std::move(Cmn::Error(errCode).withNested(std::move(*(nested)))) \
+  }
 
 }// namespace Vertaler::Cmn

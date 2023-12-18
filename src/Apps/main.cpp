@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <scn/scn.h>
@@ -71,8 +72,8 @@ try
 
   const auto hardware = Hardware::createFacade(std::cout, std::cin);
   const auto priceCalculator = BL::PriceCalculator::create();
-  const auto paymentService = BL::PaymentService::create();
-  const auto accountService = BL::AccountService::create(*priceCalculator, *paymentService);
+  const auto accountService = BL::AccountService::create();
+  const auto paymentService = BL::PaymentService::create(*priceCalculator, *accountService);
 
   BarrierControllers inputBarrierControllers;
   BarrierControllers outputBarrierControllers;

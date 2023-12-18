@@ -12,8 +12,10 @@
 namespace Vertaler::Cmn
 {
 
-
 template<typename T>
+concept NotAnError = !std::is_same_v<T, Error>;
+
+template<NotAnError T>
 class Result
 {
 public:

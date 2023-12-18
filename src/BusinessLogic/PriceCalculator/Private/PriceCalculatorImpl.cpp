@@ -1,5 +1,6 @@
 #include "PriceCalculatorImpl.h"
 
+#include "Domain/ParkingReservation.h"
 #include "Rates.h"
 
 #include "Domain/Money.h"
@@ -68,10 +69,10 @@ namespace
 }// namespace
 
 
-Cmn::Result<Domain::Money> PriceCalculatorImpl::calculateParkingPrice(const Domain::ReservationTicket &ticket,
+Cmn::Result<Domain::Money> PriceCalculatorImpl::calculateParkingPrice(const Domain::ParkingReservation &reservation,
   const Domain::TimePoint &departureTime) const
 {
-  const auto &arrivalTime = ticket.arrivalTime;
+  const auto &arrivalTime = reservation.arrivalTime;
   const auto nightDayDuration = splitNightDay(arrivalTime, departureTime);
 
   const auto parkingPrice =

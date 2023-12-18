@@ -5,10 +5,9 @@
 namespace Vertaler::ParkingSystem::BL::AccountService
 {
 
-std::unique_ptr<Interface> create(PriceCalculator::Interface &priceCalculator,
-  PaymentService::Interface &paymentService)
+std::unique_ptr<Interface> create()
 {
-  return std::make_unique<AccountServiceImpl>(priceCalculator, paymentService);
+  return std::make_unique<AccountServiceImpl>();
 }
 
 }// namespace Vertaler::ParkingSystem::BL::AccountService
