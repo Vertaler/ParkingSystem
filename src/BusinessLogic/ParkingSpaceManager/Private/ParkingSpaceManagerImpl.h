@@ -3,7 +3,6 @@
 #include "BusinessLogic/ParkingSpaceManager/Public/InterfaceWithObserver.h"
 
 #include "Domain/EntryExit.h"
-#include "Domain/ParkingReleasing.h"
 #include "Domain/ParkingReservation.h"
 #include "Domain/Vehicle.h"
 

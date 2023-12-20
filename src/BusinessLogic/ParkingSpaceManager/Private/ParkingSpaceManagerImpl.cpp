@@ -1,7 +1,6 @@
 #include "ParkingSpaceManagerImpl.h"
 
 #include "BusinessLogic/ParkingSpaceManager/Public/Errors.h"
-#include "Domain/ParkingReleasing.h"
 #include "Domain/ParkingReservation.h"
 
 #include <unordered_map>
@@ -34,13 +33,11 @@ Cmn::Result<Domain::ParkingReservation> ParkingSpaceManagerImpl::getParkingReser
 
 void ParkingSpaceManagerImpl::onEntry(const Domain::EntryRequest &req)
 {
-  const Domain::ReservationRequest reserveReq{ {}, req.time };
   reserveParkingSpace(req);
 }
 
 void ParkingSpaceManagerImpl::onExit(const Domain::ExitRequest &req)
 {
-  const Domain::ReleasingRequest releaseReq{ req.vehicleNumber, req.time };
   releaseParkingSpace(req);
 }
 
