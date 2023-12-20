@@ -40,4 +40,12 @@ function(ParkingSystem_setup_dependencies)
     cpmaddpackage("gh:lefticus/tools#update_build_system")
   endif()
 
+  if(NOT TARGET scn)
+    cpmaddpackage("gh:eliaskosunen/scnlib#v1.1.3")
+  endif()
+
+  if(NOT TARGET FakeIt::FakeIt)
+    cpmaddpackage("gh:eranpeer/FakeIt#2.4.0")
+  endif()
+
 endfunction()

@@ -25,6 +25,8 @@ project(
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
+# TODO: Get rid of hardcoded path
+link_directories("/usr/local/opt/llvm@17/lib/c++")
 
 ParkingSystem_setup_options()
 
@@ -57,6 +59,16 @@ add_library(ParkingSystem::ParkingSystem_warnings ALIAS ParkingSystem_warnings)
 # configure files based on CMake configuration options
 add_subdirectory(configured_files)
 
+find_package(Catch2 REQUIRED)
+add_executable(ParkingTests)
+target_link_libraries(ParkingTests 
+  PRIVATE 
+  Catch2::Catch2WithMain
+  FakeIt::FakeIt-catch
+  AccountService
+  PriceCalculator
+)
+target_include_directories(ParkingTests PRIVATE src)
 # Adding the src:
 add_subdirectory(src)
 
@@ -67,12 +79,6 @@ endif()
 
 # Adding the tests:
 include(CTest)
-
-if(BUILD_TESTING)
-  message(AUTHOR_WARNING "Building Tests. Be sure to check out test/constexpr_tests.cpp for constexpr testing")
-  add_subdirectory(test)
-endif()
-
 
 if(ParkingSystem_BUILD_FUZZ_TESTS)
   message(AUTHOR_WARNING "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
@@ -92,7 +98,7 @@ if(MSVC)
 endif()
 
 # set the startup project for the "play" button in MSVC
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT intro)
+# TODO: Fix set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT intro)
 
 if(CMAKE_SKIP_INSTALL_RULES)
   return()
@@ -104,7 +110,6 @@ include(cmake/PackageProject.cmake)
 # we know we want to ship
 ParkingSystem_package_project(
   TARGETS
-  intro
   ParkingSystem_options
   ParkingSystem_warnings
   # FIXME: this does not work! CK

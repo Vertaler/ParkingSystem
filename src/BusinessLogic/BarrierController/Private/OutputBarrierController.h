@@ -1,0 +1,18 @@
+#pragma once
+
+#include "BarrierControllerBase.h"
+
+namespace Vertaler::ParkingSystem::BL::BarrierController
+{
+
+class OutputBarrierController final : public BarrierControllerBase
+{
+public:
+  using BarrierControllerBase::BarrierControllerBase;
+
+protected:
+  [[nodiscard]] virtual Cmn::Result<PassVehicleResult> tryPassVehicle(const Domain::Vehicle &vehicle,
+    const Domain::TimePoint &time) const override;
+};
+
+}// namespace Vertaler::ParkingSystem::BL::BarrierController

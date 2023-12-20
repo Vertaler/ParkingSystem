@@ -1,0 +1,7 @@
+add_library(Hardware Facade.h Facade.cpp)
+target_include_directories(Hardware PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+add_subdirectory(Barrier)
+add_subdirectory(Clock)
+add_subdirectory(Printer)
+add_subdirectory(Scanner)
