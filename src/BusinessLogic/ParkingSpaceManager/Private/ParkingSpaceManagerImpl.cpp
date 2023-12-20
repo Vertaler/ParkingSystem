@@ -9,20 +9,16 @@
 namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager
 {
 
-Cmn::Result<Domain::ReservationTicket> ParkingSpaceManagerImpl::reserveParkingSpace(
-  const Domain::ReservationRequest &req)
+void ParkingSpaceManagerImpl::reserveParkingSpace(const Domain::EntryRequest &req)
 {
-  const auto &vehicleNumber = req.vehicle.number;
-  Domain::ReservationTicket ticket{ vehicleNumber, req.arrivalTime };
-  const Domain::ParkingReservation reservation{ vehicleNumber, req.arrivalTime };
+  const auto &vehicleNumber = req.vehicleNumber;
+  const Domain::ParkingReservation reservation{ req.vehicleNumber, req.time };
   _reservationStorage[vehicleNumber] = reservation;
-  return ticket;
 }
 
-Cmn::Result<Domain::ReleasingResponse> ParkingSpaceManagerImpl::releaseParkingSpace(const Domain::ReleasingRequest &req)
+void ParkingSpaceManagerImpl::releaseParkingSpace(const Domain::ExitRequest &req)
 {
   _reservationStorage.erase(req.vehicleNumber);
-  return {};
 }
 
 Cmn::Result<Domain::ParkingReservation> ParkingSpaceManagerImpl::getParkingReservation(
@@ -39,13 +35,13 @@ Cmn::Result<Domain::ParkingReservation> ParkingSpaceManagerImpl::getParkingReser
 void ParkingSpaceManagerImpl::onEntry(const Domain::EntryRequest &req)
 {
   const Domain::ReservationRequest reserveReq{ {}, req.time };
-  reserveParkingSpace(reserveReq);
+  reserveParkingSpace(req);
 }
 
 void ParkingSpaceManagerImpl::onExit(const Domain::ExitRequest &req)
 {
   const Domain::ReleasingRequest releaseReq{ req.vehicleNumber, req.time };
-  releaseParkingSpace(releaseReq);
+  releaseParkingSpace(req);
 }
 
 

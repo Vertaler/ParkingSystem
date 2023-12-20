@@ -15,13 +15,15 @@ namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager
 class ParkingSpaceManagerImpl final : public InterfaceWithObserver
 {
 public:
-  Cmn::Result<Domain::ReservationTicket> reserveParkingSpace(const Domain::ReservationRequest &req) override;
-  Cmn::Result<Domain::ReleasingResponse> releaseParkingSpace(const Domain::ReleasingRequest &req) override;
   [[nodiscard]] Cmn::Result<Domain::ParkingReservation> getParkingReservation(
     const Domain::VehicleNumber &vehicleNumber) const override;
 
   void onEntry(const Domain::EntryRequest &req) override;
   void onExit(const Domain::ExitRequest &req) override;
+
+private:
+  void reserveParkingSpace(const Domain::EntryRequest &req);
+  void releaseParkingSpace(const Domain::ExitRequest &req);
 
 private:
   std::unordered_map<Domain::VehicleNumber, Domain::ParkingReservation> _reservationStorage;
