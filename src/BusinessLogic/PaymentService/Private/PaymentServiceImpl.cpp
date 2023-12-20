@@ -17,11 +17,6 @@ namespace
     return vehicleNumber.asString();
   }
 
-
-  Domain::PaymentTicketID generateTicketID(const Domain::ReservationTicket &ticket)
-  {
-    return generateTicketID(ticket.number);
-  }
 }// namespace
 
 PaymentServiceImpl::PaymentServiceImpl(PriceCalculator::Interface &priceCalculator,
@@ -29,28 +24,26 @@ PaymentServiceImpl::PaymentServiceImpl(PriceCalculator::Interface &priceCalculat
   : _priceCalculator(priceCalculator), _parkingSpaceManager(parkingSpaceManager)
 {}
 
-Cmn::Result<Domain::PaymentTicketID> PaymentServiceImpl::registerNewReservation(const Domain::ReservationTicket &ticket)
-{
-  auto ticketId = generateTicketID(ticket);
-  assert(!needPay(ticketId).getResult());// TODO: Remove after completion work on error handling
-  _tickets.insert(ticketId);
-  return ticketId;
-}
-Cmn::Result<bool> PaymentServiceImpl::needPay(const Domain::PaymentTicketID &ticketID) const
-{
-  return _tickets.contains(ticketID);
-}
-
 Cmn::Result<void> PaymentServiceImpl::pay(const Domain::PaymentTicketID &ticketID)
 {
-  assert(needPay(ticketID).getResult());// TODO: Remove after completion work on error handling
-  _tickets.erase(ticketID);
+  auto iter = _unpdaidTickets.find(ticketID);
+  if (iter == _unpdaidTickets.end())
+  {
+    return Cmn::Error(Errc::PaymentTicketNotFound);
+  }
+
+  _paidTickets.emplace(ticketID);
   return {};
 }
 
 Cmn::Result<Domain::PaymentTicketOpt> PaymentServiceImpl::getPayment(const Domain::ExitRequest &req) const
 {
   auto paymentTicketID = generateTicketID(req.vehicleNumber);
+  if (_paidTickets.contains(paymentTicketID))
+  {
+    return Domain::PaymentTicketOpt{};
+  }
+
   if (const auto iter = _unpdaidTickets.find(paymentTicketID); iter != _unpdaidTickets.end())
   {
     return Domain::PaymentTicketOpt{ iter->second };
@@ -77,6 +70,8 @@ Cmn::Result<Domain::PaymentTicketOpt> PaymentServiceImpl::getPayment(const Domai
   Domain::PaymentTicket result;
   result.ID = std::move(paymentTicketID);
   result.parkingPrice = price.getResult();
+
+  _unpdaidTickets.emplace(result.ID, result);
 
   return Domain::PaymentTicketOpt{ result };
 }
