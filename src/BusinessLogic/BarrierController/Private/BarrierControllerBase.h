@@ -1,7 +1,7 @@
 #pragma once
 
-#include "BusinessLogic/AccountService/Public/Interface.h"
 #include "BusinessLogic/BarrierController/Public/Interface.h"
+#include "BusinessLogic/EntryExitController/Public/Interface.h"
 #include "Domain/Time.h"
 #include "Domain/Vehicle.h"
 #include "Hardware/Facade.h"
@@ -13,8 +13,8 @@ namespace Vertaler::ParkingSystem::BL::BarrierController
 class BarrierControllerBase : public BarrierController::Interface
 {
 public:
-  BarrierControllerBase(Hardware::Facade &hardwareFacade, AccountService::Interface &accountService)
-    : _hardwareFacade(hardwareFacade), _accountService(accountService)
+  BarrierControllerBase(Hardware::Facade &hardwareFacade, EntryExitController::EntryExitHandler &entryExitHandler)
+    : _hardwareFacade(hardwareFacade), _entryExitHandler(entryExitHandler)
   {}
 
   [[nodiscard]] Cmn::Result<void> handleVehicle() const override;
@@ -22,7 +22,7 @@ public:
 protected:
   using PassVehicleResult = std::pair<bool, Hardware::Printer::PrintingInfo>;
 
-  [[nodiscard]] virtual Cmn::Result<PassVehicleResult> tryPassVehicle(const Domain::Vehicle &vehicle,
+  [[nodiscard]] virtual Cmn::Result<PassVehicleResult> tryPassVehicle(const Domain::VehicleNumber &vehicle,
     const Domain::TimePoint &time) const = 0;
 
   [[nodiscard]] Hardware::Facade &getHardwareFacade() const noexcept
@@ -30,14 +30,14 @@ protected:
     return _hardwareFacade;
   }
 
-  [[nodiscard]] AccountService::Interface &getAccountService() const noexcept
+  [[nodiscard]] EntryExitController::EntryExitHandler &getEntryExitHandler() const noexcept
   {
-    return _accountService;
+    return _entryExitHandler;
   }
 
 private:
   Hardware::Facade &_hardwareFacade;
-  AccountService::Interface &_accountService;
+  EntryExitController::EntryExitHandler &_entryExitHandler;
 };
 
 }// namespace Vertaler::ParkingSystem::BL::BarrierController

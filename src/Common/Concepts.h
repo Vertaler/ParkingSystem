@@ -10,7 +10,6 @@ namespace Vertaler::Cmn
 // Which has quite old version and doesn't have concept implementation
 // So we workaround it with own implementation of needed standard concepts
 
-
 template<class T, class... Args>
 concept ConstructibleFrom = std::is_nothrow_destructible_v<T> && std::is_constructible_v<T, Args...>;
 

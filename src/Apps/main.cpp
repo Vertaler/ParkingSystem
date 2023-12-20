@@ -2,10 +2,14 @@
 #include "BusinessLogic/AccountService/Public/Interface.h"
 #include "BusinessLogic/BarrierController/Public/Factory.h"
 #include "BusinessLogic/BarrierController/Public/Interface.h"
+#include "BusinessLogic/EntryExitController/Public/Factory.h"
+#include "BusinessLogic/EntryExitController/Public/Interface.h"
 #include "BusinessLogic/PaymentService/Public/Factory.h"
 #include "BusinessLogic/PaymentService/Public/Interface.h"
 #include "BusinessLogic/PriceCalculator/Public/Factory.h"
 #include "BusinessLogic/PriceCalculator/Public/Interface.h"
+#include "BusinessLogic/VehicleCatalog/Public/Factory.h"
+#include "BusinessLogic/VehicleCatalog/Public/Interface.h"
 
 
 #include "Domain/PaymentTicket.h"
@@ -72,8 +76,13 @@ try
 
   const auto hardware = Hardware::createFacade(std::cout, std::cin);
   const auto priceCalculator = BL::PriceCalculator::create();
+  const auto vehicleCatalog = BL::VehicleCatalog::create();
   const auto accountService = BL::AccountService::create();
   const auto paymentService = BL::PaymentService::create(*priceCalculator, *accountService);
+  const auto entryExitController = BL::EntryExitController::create(*paymentService, *vehicleCatalog);
+
+  // TODO: Obserser should register itself
+  entryExitController->registerObserver(*accountService);
 
   BarrierControllers inputBarrierControllers;
   BarrierControllers outputBarrierControllers;
@@ -81,13 +90,13 @@ try
   inputBarrierControllers.reserve(inputBarriersCount);
   for (size_t i = 0; i < inputBarriersCount; ++i)
   {
-    inputBarrierControllers.push_back(BL::BarrierController::createInputContoller(*hardware, *accountService));
+    inputBarrierControllers.push_back(BL::BarrierController::createInputContoller(*hardware, *entryExitController));
   }
 
   outputBarrierControllers.reserve(outputBarriersCount);
   for (size_t i = 0; i < outputBarriersCount; ++i)
   {
-    outputBarrierControllers.push_back(BL::BarrierController::createOutputContoller(*hardware, *accountService));
+    outputBarrierControllers.push_back(BL::BarrierController::createOutputContoller(*hardware, *entryExitController));
   }
 
   const char *promptMessage =

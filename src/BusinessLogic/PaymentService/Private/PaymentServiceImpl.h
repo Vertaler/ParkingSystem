@@ -21,7 +21,7 @@ public:
   Cmn::Result<Domain::PaymentTicketID> registerNewReservation(const Domain::ReservationTicket &ticket) override;
   Cmn::Result<bool> needPay(const Domain::PaymentTicketID &ticketID) const override;
   Cmn::Result<void> pay(const Domain::PaymentTicketID &ticketID) override;
-  Cmn::Result<Domain::PaymentTicket> getPayment(const Domain::ExitRequest &req) const override;
+  Cmn::Result<Domain::PaymentTicketOpt> getPayment(const Domain::ExitRequest &req) const override;
 
 private:
   std::unordered_set<Domain::PaymentTicketID> _tickets;

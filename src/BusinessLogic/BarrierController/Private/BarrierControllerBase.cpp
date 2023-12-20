@@ -20,10 +20,9 @@ Cmn::Result<void> BarrierControllerBase::handleVehicle() const
   // TODO Implement more complex logic of scanner result parsing
   // And move it to separate place
   const Domain::VehicleNumber vehicleNumber{ scannedData.getResult().data };
-  const Domain::Vehicle vehicle{ vehicleNumber };
 
   const auto currentTime = hardware.getClock().now().getResult();
-  const auto passRes = tryPassVehicle(vehicle, currentTime);
+  const auto passRes = tryPassVehicle(vehicleNumber, currentTime);
   const auto &[shouldPassVehicle, printingInfo] = passRes.getResult();
   if (shouldPassVehicle)
   {

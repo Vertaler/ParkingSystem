@@ -11,7 +11,7 @@ public:
   using BarrierControllerBase::BarrierControllerBase;
 
 protected:
-  [[nodiscard]] virtual Cmn::Result<PassVehicleResult> tryPassVehicle(const Domain::Vehicle &vehicle,
+  [[nodiscard]] virtual Cmn::Result<PassVehicleResult> tryPassVehicle(const Domain::VehicleNumber &vehicleNumber,
     const Domain::TimePoint &time) const override;
 };
 

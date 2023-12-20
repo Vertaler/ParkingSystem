@@ -35,4 +35,17 @@ Cmn::Result<Domain::ParkingReservation> AccountServiceImpl::getParkingReservatio
   return { Cmn::Error(Errc::ReservationNotFound) };
 }
 
+void AccountServiceImpl::onEntry(const Domain::EntryRequest &req)
+{
+  const Domain::ReservationRequest reserveReq{ {}, req.time };
+  reserveParkingSpace(reserveReq);
+}
+
+void AccountServiceImpl::onExit(const Domain::ExitRequest &req)
+{
+  const Domain::ReleasingRequest releaseReq{ req.vehicleNumber, req.time };
+  releaseParkingSpace(releaseReq);
+}
+
+
 }// namespace Vertaler::ParkingSystem::BL::AccountService

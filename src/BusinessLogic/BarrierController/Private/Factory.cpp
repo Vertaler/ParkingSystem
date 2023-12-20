@@ -6,14 +6,16 @@
 namespace Vertaler::ParkingSystem::BL::BarrierController
 {
 
-std::unique_ptr<Interface> createInputContoller(Hardware::Facade &hardware, AccountService::Interface &accountService)
+std::unique_ptr<Interface> createInputContoller(Hardware::Facade &hardware,
+  EntryExitController::EntryExitHandler &entryExitHandler)
 {
-  return std::make_unique<InputBarrierController>(hardware, accountService);
+  return std::make_unique<InputBarrierController>(hardware, entryExitHandler);
 }
 
-std::unique_ptr<Interface> createOutputContoller(Hardware::Facade &hardware, AccountService::Interface &accountService)
+std::unique_ptr<Interface> createOutputContoller(Hardware::Facade &hardware,
+  EntryExitController::EntryExitHandler &entryExitHandler)
 {
-  return std::make_unique<OutputBarrierController>(hardware, accountService);
+  return std::make_unique<OutputBarrierController>(hardware, entryExitHandler);
 }
 
 

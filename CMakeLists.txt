@@ -66,6 +66,7 @@ target_link_libraries(ParkingTests
   Catch2::Catch2WithMain
   FakeIt::FakeIt-catch
   AccountService
+  EntryExitController
   PriceCalculator
 )
 target_include_directories(ParkingTests PRIVATE src)

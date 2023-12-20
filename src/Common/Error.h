@@ -3,7 +3,6 @@
 #include "Concepts.h"
 
 #include <memory>
-#include <optional>
 #include <source_location>
 #include <string>
 #include <string_view>
@@ -77,9 +76,35 @@ private:
   std::unique_ptr<Error> _nested;// Can't use optional recursively
 };
 
-#define CMN_NESTED_ERR(errCode, nested)                             \
-  {                                                                 \
-    std::move(Cmn::Error(errCode).withNested(std::move(*(nested)))) \
+// General error codes
+enum class Errc
+{
+  DependencyError// Error caused by error in other componet
+};
+
+inline std::string_view errDomain()
+{
+  static const std::string_view domain = "General";
+  return domain;
+}
+
+inline Cmn::ErrorCode makeErrorCode(Errc errCodeEnum)
+{
+  return { errDomain(), errCodeEnum };
+}
+
+// TODO: Simplify code for making nested errors.
+// Probably need to create custom copy ctor
+#define CMN_NESTED_ERR(errCode, nested)                                                \
+  {                                                                                    \
+    std::move(Cmn::Error(Cmn::Errc::DependencyError).withNested(std::move(*(nested)))) \
   }
+
+#define CMN_HANDLE_DEPENDENCY_ERR(result)                   \
+  if (auto *err = (result).getError(); err != nullptr)      \
+  {                                                         \
+    return CMN_NESTED_ERR(Cmn::Errc::DependencyError, err); \
+  }
+
 
 }// namespace Vertaler::Cmn

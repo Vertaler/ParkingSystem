@@ -1,20 +1,15 @@
 #pragma once
 
+#include "BusinessLogic/AccountService/Public/InterfaceWithObserver.h"
+
 #include <memory>
 
-namespace Vertaler::ParkingSystem::BL::PriceCalculator
+namespace Vertaler::ParkingSystem::BL::EntryExitController
 {
-class Interface;
-}
-
-namespace Vertaler::ParkingSystem::BL::PaymentService
-{
-class Interface;
+class Observable;
 }
 
 namespace Vertaler::ParkingSystem::BL::AccountService
 {
-class Interface;
-std::unique_ptr<Interface> create();
-
+std::unique_ptr<InterfaceWithObserver> create();
 }// namespace Vertaler::ParkingSystem::BL::AccountService

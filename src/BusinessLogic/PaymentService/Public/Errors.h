@@ -7,9 +7,7 @@ namespace Vertaler::ParkingSystem::BL::PaymentService
 
 enum class Errc
 {
-  PaymentTicketNotFound,
-  PriceCalculatorError,
-  AccountServiceError
+  PaymentTicketNotFound
 };
 
 inline std::string_view errDomain()
