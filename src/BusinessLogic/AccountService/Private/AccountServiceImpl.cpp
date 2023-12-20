@@ -1,4 +1,7 @@
 #include "AccountServiceImpl.h"
+
+#include "BusinessLogic/AccountService/Public/Errors.h"
+
 #include "Domain/ParkingReleasing.h"
 #include "Domain/PaymentTicket.h"
 
@@ -16,20 +19,19 @@ Cmn::Result<Domain::ReservationTicket> AccountServiceImpl::reserveParkingSpace(c
 {
   const auto &vehicleNumber = req.vehicle.number;
   Domain::ReservationTicket ticket{ vehicleNumber, req.arrivalTime };
-  _storage[vehicleNumber.asString()] = ticket;
+  _storage[vehicleNumber] = ticket;
   const auto paymentTicket = _paymentService.registerNewReservation(ticket);
-  _paymentTicketsIDs.emplace(vehicleNumber.asString(), paymentTicket.getResult());
+  _paymentTicketsIDs.emplace(vehicleNumber, paymentTicket.getResult());
   return ticket;
 }
 
 Cmn::Result<Domain::ReleasingResponse> AccountServiceImpl::releaseParkingSpace(const Domain::ReleasingRequest &req)
 {
-  const auto vehicleNumber = req.vehicleNumber.asString();
+  const auto &vehicleNumber = req.vehicleNumber;
   if (auto iter = _storage.find(vehicleNumber); iter != _storage.end())
   {
     const auto reservationTicket = iter->second;
     const auto &paymentTicketID = _paymentTicketsIDs.at(vehicleNumber);
-
 
     if (!_paymentService.needPay(paymentTicketID).getResult())
     {
@@ -43,7 +45,7 @@ Cmn::Result<Domain::ReleasingResponse> AccountServiceImpl::releaseParkingSpace(c
     return Domain::ReleasingResponse{ Domain::ReleasingStatus::PaymentRequired,
       Domain::PaymentTicket{ price.getResult(), paymentTicketID } };
   }
-  return {};
+  return Cmn::Error(Errc::ReservationNotFound);
 }
 
 

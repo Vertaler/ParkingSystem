@@ -3,9 +3,17 @@
 namespace Vertaler::ParkingSystem::BL::PaymentService
 {
 
+namespace
+{
+  Domain::PaymentTicketID generateTicketID(const Domain::ReservationTicket &ticket)
+  {
+    return ticket.number.asString();
+  }
+}// namespace
+
 Cmn::Result<Domain::PaymentTicketID> PaymentServiceImpl::registerNewReservation(const Domain::ReservationTicket &ticket)
 {
-  auto ticketId = ticket.number.asString();
+  auto ticketId = generateTicketID(ticket);
   assert(!needPay(ticketId).getResult());// TODO: Remove after completion work on error handling
   _tickets.insert(ticketId);
   return ticketId;

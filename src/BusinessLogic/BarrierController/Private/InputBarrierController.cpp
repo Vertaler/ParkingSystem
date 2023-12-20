@@ -1,5 +1,10 @@
 #include "InputBarrierController.h"
+
 #include "Domain/ParkingReservation.h"
+#include "Domain/Time.h"
+#include "Domain/Vehicle.h"
+
+#include "Common/Result.h"
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -10,7 +15,7 @@ namespace Vertaler::ParkingSystem::BL::BarrierController
 auto InputBarrierController::tryPassVehicle(const Domain::Vehicle &vehicle, const Domain::TimePoint &time) const
   -> Cmn::Result<PassVehicleResult>
 {
-  Domain::ReservationRequest req{ vehicle, time };
+  const Domain::ReservationRequest req{ vehicle, time };
   auto res = getAccountService().reserveParkingSpace(req);
   if (auto *err = res.getError(); err != nullptr)
   {

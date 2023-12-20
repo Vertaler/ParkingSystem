@@ -11,7 +11,7 @@ namespace Vertaler::ParkingSystem::BL::BarrierController
 auto OutputBarrierController::tryPassVehicle(const Domain::Vehicle &vehicle, const Domain::TimePoint &time) const
   -> Cmn::Result<PassVehicleResult>
 {
-  Domain::ReleasingRequest req{ vehicle.number, time };
+  const Domain::ReleasingRequest req{ vehicle.number, time };
   auto res = getAccountService().releaseParkingSpace(req);
   if (auto *err = res.getError(); err != nullptr)
   {

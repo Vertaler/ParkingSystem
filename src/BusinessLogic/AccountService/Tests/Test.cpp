@@ -1,121 +1,91 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include "BusinessLogic/AccountService/Public/Errors.h"
 #include "BusinessLogic/AccountService/Public/Factory.h"
 #include "BusinessLogic/AccountService/Public/Interface.h"
 #include "BusinessLogic/PaymentService/Public/Interface.h"
 #include "BusinessLogic/PriceCalculator/Public/Interface.h"
 #include "Common/Result.h"
+#include "Domain/Money.h"
 #include "Domain/ParkingReleasing.h"
 #include "Domain/ParkingReservation.h"
-#include "Domain/Time.h"
 #include "Domain/Vehicle.h"
 
 #include <chrono>
+#include <cstddef>
+#include <memory>
+
+#include <fakeit.hpp>
 
 namespace Vertaler::ParkingSystem::BL::AccountService::Tests
 {
 
-namespace
-{
-  class PriceCalculatorMock : public PriceCalculator::Interface
-  {
-  public:
-    explicit PriceCalculatorMock(size_t result) : _result({ result }) {}
-
-    Cmn::Result<Domain::Money> calculateParkingPrice(const Domain::ReservationTicket & /*ticket*/,
-      const Domain::TimePoint & /*departureTime*/) const override
-    {
-      _callCount++;
-      return _result;
-    }
-
-    size_t callCount() const noexcept
-    {
-      return _callCount;
-    }
-
-  private:
-    mutable size_t _callCount{ 0 };
-    Domain::Money _result;
-  };
-
-
-  class PaymentServiceMock : public PaymentService::Interface
-  {
-  public:
-    size_t getRegisterCallCount() const noexcept
-    {
-      return _registerCallCount;
-    }
-
-    void setNeedPay(bool value) noexcept
-    {
-      _needPay = value;
-    }
-
-    Cmn::Result<Domain::PaymentTicketID> registerNewReservation(const Domain::ReservationTicket & /*ticket*/) override
-    {
-      _registerCallCount++;
-      return { Domain::PaymentTicketID{ "MockTicketID" } };
-    }
-    Cmn::Result<bool> needPay(const Domain::PaymentTicketID & /*ticketID*/) const override
-    {
-      return _needPay;
-    }
-    Cmn::Result<void> pay(const Domain::PaymentTicketID & /*ticketID*/) override
-    {
-      return {};
-    }
-
-  private:
-    mutable size_t _registerCallCount{ 0 };
-    bool _needPay{ false };
-  };
-}// namespace
+using namespace fakeit;
 
 TEST_CASE("Basic account service tests", "[AccountService]")
 {
-  constexpr size_t MockedPrice = 1234;
 
-  PriceCalculatorMock priceCalculatorMock(MockedPrice);
-  PaymentServiceMock paymentServiceMock;
+  fakeit::Mock<PriceCalculator::Interface> priceCalculatorMock;
+  fakeit::Mock<PaymentService::Interface> paymentServiceMock;
 
-  // PaymentService::Interface &paymentService = paymentServiceMock;
-  // PriceCalculator::Interface &priceCalculator = priceCalculatorMock;
-
-  std::unique_ptr<Interface> accountService = create(priceCalculatorMock, paymentServiceMock);
-
-  using namespace std::chrono;
-  using namespace std::chrono_literals;
-
-  const auto time = system_clock::now();
+  const std::unique_ptr<Interface> accountService = create(priceCalculatorMock.get(), paymentServiceMock.get());
+  const auto time = std::chrono::system_clock::now();
   const Domain::VehicleNumber vehicleNumber{ "123" };
 
+  SECTION("Reserve parking space")
   {
     const Domain::Vehicle vehicle{ vehicleNumber };
-    Domain::ReservationRequest request{ vehicle, time };
-    auto res = accountService->reserveParkingSpace(request);
-    REQUIRE(res.getError() == nullptr);
-    REQUIRE(res.getResult().number.asString() == vehicleNumber.asString());
-    REQUIRE(paymentServiceMock.getRegisterCallCount() == 1);
-  }
+    const Domain::ReservationRequest request{ vehicle, time };
 
-  {
-    paymentServiceMock.setNeedPay(true);
-    Domain::ReleasingRequest request{ vehicleNumber, time };
-    auto res = accountService->releaseParkingSpace(request);
+    using namespace std::string_literals;
+    When(Method(paymentServiceMock, registerNewReservation)).Return("123"s);
+
+    auto res = accountService->reserveParkingSpace(request);
+
     REQUIRE(res.getError() == nullptr);
-    REQUIRE(res.getResult().status == Domain::ReleasingStatus::PaymentRequired);
-    const auto &paymentTicket = res.getResult().paymentTicket;
-    REQUIRE(paymentTicket->parkingPrice.amount == MockedPrice);
-    REQUIRE(priceCalculatorMock.callCount() == 1);
+    REQUIRE(res.getResult().number == vehicleNumber);
+    Verify(Method(paymentServiceMock, registerNewReservation));
+    SECTION("Release after reserve. Payment required")
+    {
+      constexpr size_t MockedPrice = 1234;
+      const Domain::Money MockedMoney{ MockedPrice };
+      When(Method(paymentServiceMock, needPay)).Return(true);
+      When(Method(priceCalculatorMock, calculateParkingPrice)).Return(MockedMoney);
+
+
+      const Domain::ReleasingRequest request{ vehicleNumber, time };
+      auto res = accountService->releaseParkingSpace(request);
+      const auto &paymentTicket = res.getResult().paymentTicket;
+
+      REQUIRE(res.getError() == nullptr);
+      REQUIRE(res.getResult().status == Domain::ReleasingStatus::PaymentRequired);
+      REQUIRE(res.getResult().paymentTicket.has_value());
+      // NOLINTBEGIN(bugprone-unchecked-optional-access) Checked line above)
+      REQUIRE(paymentTicket->parkingPrice.amount == MockedPrice);
+      // NOLINTEND(bugprone-unchecked-optional-access)
+      Verify(Method(priceCalculatorMock, calculateParkingPrice));
+    }
+    SECTION("Release after reserve. No payment required")
+    {
+      When(Method(paymentServiceMock, needPay)).Return(false);
+
+      const Domain::ReleasingRequest request{ vehicleNumber, time };
+      auto res = accountService->releaseParkingSpace(request);
+
+      REQUIRE(res.getError() == nullptr);
+      REQUIRE(res.getResult().status == Domain::ReleasingStatus::OK);
+    }
   }
+  SECTION("Release without reserve causes error")
   {
-    paymentServiceMock.setNeedPay(false);
-    Domain::ReleasingRequest request{ vehicleNumber, time };
+    When(Method(paymentServiceMock, needPay)).Return(false);
+
+    const Domain::ReleasingRequest request{ vehicleNumber, time };
     auto res = accountService->releaseParkingSpace(request);
-    REQUIRE(res.getError() == nullptr);
-    REQUIRE(res.getResult().status == Domain::ReleasingStatus::OK);
+    const auto *err = res.getError();
+
+    REQUIRE(err != nullptr);
+    REQUIRE(err->is(AccountService::Errc::ReservationNotFound));
   }
 }
 
