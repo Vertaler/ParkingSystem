@@ -19,8 +19,8 @@ TEST_CASE("Price calculated w/o errors", "[PriceCalculator]")
 
   const auto arrivalTime = system_clock::now();
   const auto departureTime = arrivalTime + 4h;
-  const Domain::ReservationTicket ticket{ Domain::VehicleNumber{ "123" }, arrivalTime };
-  auto res = priceCalculator->calculateParkingPrice(ticket, departureTime);
+  const Domain::ParkingReservation reservation{ Domain::VehicleNumber{ "123" }, arrivalTime };
+  auto res = priceCalculator->calculateParkingPrice(reservation, departureTime);
 
   REQUIRE(res.getError() == nullptr);
   REQUIRE(res.getResult().amount == 100);

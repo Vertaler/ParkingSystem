@@ -1,14 +1,21 @@
-#include "BusinessLogic/AccountService/Public/Factory.h"
-#include "BusinessLogic/AccountService/Public/Interface.h"
 #include "BusinessLogic/BarrierController/Public/Factory.h"
 #include "BusinessLogic/BarrierController/Public/Interface.h"
+#include "BusinessLogic/BarrierController/Public/RequestProvider.h"
+#include "BusinessLogic/EntryExitController/Public/Factory.h"
+#include "BusinessLogic/EntryExitController/Public/Interface.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/Factory.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/Interface.h"
 #include "BusinessLogic/PaymentService/Public/Factory.h"
 #include "BusinessLogic/PaymentService/Public/Interface.h"
 #include "BusinessLogic/PriceCalculator/Public/Factory.h"
 #include "BusinessLogic/PriceCalculator/Public/Interface.h"
+#include "BusinessLogic/VehicleCatalog/Public/Factory.h"
+#include "BusinessLogic/VehicleCatalog/Public/Interface.h"
 
 
+#include "Common/Result.h"
 #include "Domain/PaymentTicket.h"
+#include "Domain/Vehicle.h"
 #include "Hardware/Facade.h"
 
 #include "Hardware/Barrier/Barrier.h"
@@ -55,6 +62,29 @@ void handleVehicle(const BarrierControllers &controllers, const std::string &bar
   }
 }
 
+class ScannerRequestProvider : public BL::BarrierController::RequestProvider
+{
+public:
+  explicit ScannerRequestProvider(Hardware::Scanner &scanner) : _scanner(scanner) {}
+  [[nodiscard]] Cmn::Result<Domain::VehicleNumber> receiveVehicleNumber() const override
+  {
+    const auto scannedData = _scanner.scan();
+    return Domain::VehicleNumber{ scannedData.getResult().data };
+  }
+
+private:
+  Hardware::Scanner &_scanner;
+};
+
+class SMSRequestProvider : public BL::BarrierController::RequestProvider
+{
+public:
+  [[nodiscard]] Cmn::Result<Domain::VehicleNumber> receiveVehicleNumber() const override
+  {
+    return Domain::VehicleNumber{ "NUMBER_FROM_SMS" };
+  }
+};
+
 int main(int argc, const char **argv)
 try
 {
@@ -71,8 +101,15 @@ try
 
   const auto hardware = Hardware::createFacade(std::cout, std::cin);
   const auto priceCalculator = BL::PriceCalculator::create();
-  const auto paymentService = BL::PaymentService::create();
-  const auto accountService = BL::AccountService::create(*priceCalculator, *paymentService);
+  const auto vehicleCatalog = BL::VehicleCatalog::create();
+  const auto parkingSpaceManager = BL::ParkingSpaceManager::create();
+  const auto paymentService = BL::PaymentService::create(*priceCalculator, *parkingSpaceManager);
+  const auto entryExitController = BL::EntryExitController::create(*paymentService, *vehicleCatalog);
+
+  // TODO: Obserser should register itself
+  entryExitController->registerObserver(*parkingSpaceManager);
+
+  const ScannerRequestProvider requestProvider{ hardware->getScanner() };
 
   BarrierControllers inputBarrierControllers;
   BarrierControllers outputBarrierControllers;
@@ -80,13 +117,15 @@ try
   inputBarrierControllers.reserve(inputBarriersCount);
   for (size_t i = 0; i < inputBarriersCount; ++i)
   {
-    inputBarrierControllers.push_back(BL::BarrierController::createInputContoller(*hardware, *accountService));
+    inputBarrierControllers.push_back(
+      BL::BarrierController::createInputContoller(*hardware, *entryExitController, requestProvider));
   }
 
   outputBarrierControllers.reserve(outputBarriersCount);
   for (size_t i = 0; i < outputBarriersCount; ++i)
   {
-    outputBarrierControllers.push_back(BL::BarrierController::createOutputContoller(*hardware, *accountService));
+    outputBarrierControllers.push_back(
+      BL::BarrierController::createOutputContoller(*hardware, *entryExitController, requestProvider));
   }
 
   const char *promptMessage =

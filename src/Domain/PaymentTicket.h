@@ -2,6 +2,7 @@
 
 #include "Domain/Money.h"
 
+#include <optional>
 #include <string>
 
 namespace Vertaler::ParkingSystem::Domain
@@ -14,5 +15,7 @@ struct PaymentTicket
   Money parkingPrice;
   PaymentTicketID ID;
 };
+
+using PaymentTicketOpt = std::optional<PaymentTicket>;
 
 }// namespace Vertaler::ParkingSystem::Domain

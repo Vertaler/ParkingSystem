@@ -3,7 +3,6 @@
 #include "Common/Result.h"
 
 #include "Domain/Money.h"
-#include "Domain/ParkingReleasing.h"
 #include "Domain/ParkingReservation.h"
 #include "Domain/Time.h"
 
@@ -15,7 +14,7 @@ class Interface
 {
 public:
   virtual ~Interface() = default;
-  virtual Cmn::Result<Domain::Money> calculateParkingPrice(const Domain::ReservationTicket &ticket,
+  virtual Cmn::Result<Domain::Money> calculateParkingPrice(const Domain::ParkingReservation &reservation,
     const Domain::TimePoint &departureTime) const = 0;
 };
 

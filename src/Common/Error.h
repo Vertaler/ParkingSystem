@@ -2,7 +2,7 @@
 
 #include "Concepts.h"
 
-#include <optional>
+#include <memory>
 #include <source_location>
 #include <string>
 #include <string_view>
@@ -36,7 +36,8 @@ class Error
 {
 public:
   template<Enum ErrType>
-  explicit Error(ErrType enumErrCode) : _errCode(makeErrorCode(enumErrCode))
+  explicit Error(ErrType enumErrCode, std::source_location sourceLocation = std::source_location::current())
+    : _errCode(makeErrorCode(enumErrCode)), _sourceLocation(std::move(sourceLocation))
   {}
 
   [[nodiscard]] const Error *getNested() const noexcept
@@ -50,9 +51,14 @@ public:
     return _errCode == makeErrorCode(enumErrCode);
   }
 
-  Error &withNested(Error err) noexcept
+  const std::source_location &sourceLocation() const noexcept
   {
-    _nested.reset(new Error(std::move(err)));
+    return _sourceLocation;
+  }
+
+  Error &withNested(Error &&err) noexcept
+  {
+    _nested = std::make_unique<Error>(std::move(err));
     return *this;
   }
 
@@ -62,11 +68,43 @@ public:
     return *this;
   }
 
+
 private:
   ErrorCode _errCode;
   std::string _message;
-  // std::source_location _sourceLocation;
+  std::source_location _sourceLocation;
   std::unique_ptr<Error> _nested;// Can't use optional recursively
 };
+
+// General error codes
+enum class Errc
+{
+  DependencyError// Error caused by error in other componet
+};
+
+inline std::string_view errDomain()
+{
+  static const std::string_view domain = "General";
+  return domain;
+}
+
+inline Cmn::ErrorCode makeErrorCode(Errc errCodeEnum)
+{
+  return { errDomain(), errCodeEnum };
+}
+
+// TODO: Simplify code for making nested errors.
+// Probably need to create custom copy ctor
+#define CMN_NESTED_ERR(errCode, nested)                                                \
+  {                                                                                    \
+    std::move(Cmn::Error(Cmn::Errc::DependencyError).withNested(std::move(*(nested)))) \
+  }
+
+#define CMN_HANDLE_DEPENDENCY_ERR(result)                   \
+  if (auto *err = (result).getError(); err != nullptr)      \
+  {                                                         \
+    return CMN_NESTED_ERR(Cmn::Errc::DependencyError, err); \
+  }
+
 
 }// namespace Vertaler::Cmn

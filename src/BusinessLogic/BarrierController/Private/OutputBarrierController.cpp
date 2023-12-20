@@ -1,6 +1,5 @@
 #include "OutputBarrierController.h"
-#include "Domain/ParkingReleasing.h"
-#include "Domain/ParkingReservation.h"
+#include "Domain/EntryExit.h"
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -8,21 +7,21 @@
 namespace Vertaler::ParkingSystem::BL::BarrierController
 {
 
-auto OutputBarrierController::tryPassVehicle(const Domain::Vehicle &vehicle, const Domain::TimePoint &time) const
-  -> Cmn::Result<PassVehicleResult>
+auto OutputBarrierController::tryPassVehicle(const Domain::VehicleNumber &vehicleNumber,
+  const Domain::TimePoint &time) const -> Cmn::Result<PassVehicleResult>
 {
-  const Domain::ReleasingRequest req{ vehicle.number, time };
-  auto res = getAccountService().releaseParkingSpace(req);
+  const Domain::ExitRequest req{ vehicleNumber, time };
+  auto res = getEntryExitHandler().exit(req);
   if (auto *err = res.getError(); err != nullptr)
   {
     return PassVehicleResult{ false, { "Couldn't pass car" } };
   }
 
   const auto &releasingResponse = res.getResult();
-  if (releasingResponse.status == Domain::ReleasingStatus::OK)
+  if (releasingResponse.status == Domain::ExitStatus::OK)
   {
     return PassVehicleResult{ true, { "Bon Voyage!" } };
-  } else if (releasingResponse.status == Domain::ReleasingStatus::PaymentRequired)
+  } else if (releasingResponse.status == Domain::ExitStatus::PaymentRequired)
   {
     const auto &paymentTicket = *releasingResponse.paymentTicket;
     const auto printMessage = fmt::format(

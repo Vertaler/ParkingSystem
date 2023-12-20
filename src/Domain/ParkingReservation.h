@@ -7,16 +7,11 @@
 namespace Vertaler::ParkingSystem::Domain
 {
 
-struct ReservationRequest
-{
-  Vehicle vehicle;
-  TimePoint arrivalTime;
-};
-
-struct ReservationTicket
+struct ParkingReservation
 {
   VehicleNumber number;
   TimePoint arrivalTime;
 };
+
 
 }// namespace Vertaler::ParkingSystem::Domain
