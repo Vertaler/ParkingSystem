@@ -6,7 +6,7 @@
 
 #include "Common/CompositeInterface.h"
 
-namespace Vertaler::ParkingSystem::BL::AccountService
+namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager
 {
 using InterfaceWithObserver = Cmn::CompositeInterface<Interface, EntryExitController::Observer>;
 }

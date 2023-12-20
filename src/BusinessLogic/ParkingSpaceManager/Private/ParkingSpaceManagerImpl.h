@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BusinessLogic/AccountService/Public/InterfaceWithObserver.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/InterfaceWithObserver.h"
 
 #include "Domain/EntryExit.h"
 #include "Domain/ParkingReleasing.h"
@@ -9,10 +9,10 @@
 
 #include <unordered_map>
 
-namespace Vertaler::ParkingSystem::BL::AccountService
+namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager
 {
 
-class AccountServiceImpl final : public InterfaceWithObserver
+class ParkingSpaceManagerImpl final : public InterfaceWithObserver
 {
 public:
   Cmn::Result<Domain::ReservationTicket> reserveParkingSpace(const Domain::ReservationRequest &req) override;
@@ -27,4 +27,4 @@ private:
   std::unordered_map<Domain::VehicleNumber, Domain::ParkingReservation> _reservationStorage;
 };
 
-}// namespace Vertaler::ParkingSystem::BL::AccountService
+}// namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager

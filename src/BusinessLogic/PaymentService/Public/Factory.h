@@ -11,7 +11,7 @@ namespace PriceCalculator
   class Interface;
 }
 
-namespace AccountService
+namespace ParkingSpaceManager
 {
   class Interface;
 }
@@ -22,5 +22,5 @@ namespace Vertaler::ParkingSystem::BL::PaymentService
 {
 class Interface;
 std::unique_ptr<Interface> create(PriceCalculator::Interface &priceCalculator,
-  AccountService::Interface &accountService);
+  ParkingSpaceManager::Interface &parkingSpaceManager);
 }// namespace Vertaler::ParkingSystem::BL::PaymentService

@@ -6,7 +6,7 @@
 #include "Domain/ParkingReservation.h"
 #include "Domain/Vehicle.h"
 
-namespace Vertaler::ParkingSystem::BL::AccountService
+namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager
 {
 
 class Interface
@@ -19,4 +19,4 @@ public:
     const Domain::VehicleNumber &vehicleNumber) const = 0;
 };
 
-}// namespace Vertaler::ParkingSystem::BL::AccountService
+}// namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager

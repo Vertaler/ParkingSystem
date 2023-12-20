@@ -11,7 +11,7 @@ set(BARRIER_CONTROLLER_SRC
 add_library(BarrierController ${BARRIER_CONTROLLER_SRC})
 target_include_directories(BarrierController PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(BarrierController 
-    AccountService 
+    ParkingSpaceManager 
     Hardware
     fmt::fmt
  )

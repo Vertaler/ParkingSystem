@@ -1,6 +1,6 @@
 add_executable(ParkingSystem main.cpp)
 target_link_libraries(ParkingSystem
-  AccountService
+  ParkingSpaceManager
   BarrierController
   Hardware
   PriceCalculator

@@ -1,15 +1,16 @@
-#include "AccountServiceImpl.h"
+#include "ParkingSpaceManagerImpl.h"
 
-#include "BusinessLogic/AccountService/Public/Errors.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/Errors.h"
 #include "Domain/ParkingReleasing.h"
 #include "Domain/ParkingReservation.h"
 
 #include <unordered_map>
 
-namespace Vertaler::ParkingSystem::BL::AccountService
+namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager
 {
 
-Cmn::Result<Domain::ReservationTicket> AccountServiceImpl::reserveParkingSpace(const Domain::ReservationRequest &req)
+Cmn::Result<Domain::ReservationTicket> ParkingSpaceManagerImpl::reserveParkingSpace(
+  const Domain::ReservationRequest &req)
 {
   const auto &vehicleNumber = req.vehicle.number;
   Domain::ReservationTicket ticket{ vehicleNumber, req.arrivalTime };
@@ -18,13 +19,13 @@ Cmn::Result<Domain::ReservationTicket> AccountServiceImpl::reserveParkingSpace(c
   return ticket;
 }
 
-Cmn::Result<Domain::ReleasingResponse> AccountServiceImpl::releaseParkingSpace(const Domain::ReleasingRequest &req)
+Cmn::Result<Domain::ReleasingResponse> ParkingSpaceManagerImpl::releaseParkingSpace(const Domain::ReleasingRequest &req)
 {
   _reservationStorage.erase(req.vehicleNumber);
   return {};
 }
 
-Cmn::Result<Domain::ParkingReservation> AccountServiceImpl::getParkingReservation(
+Cmn::Result<Domain::ParkingReservation> ParkingSpaceManagerImpl::getParkingReservation(
   const Domain::VehicleNumber &vehicleNumber) const
 {
   if (auto iter = _reservationStorage.find(vehicleNumber); iter != _reservationStorage.end())
@@ -35,17 +36,17 @@ Cmn::Result<Domain::ParkingReservation> AccountServiceImpl::getParkingReservatio
   return { Cmn::Error(Errc::ReservationNotFound) };
 }
 
-void AccountServiceImpl::onEntry(const Domain::EntryRequest &req)
+void ParkingSpaceManagerImpl::onEntry(const Domain::EntryRequest &req)
 {
   const Domain::ReservationRequest reserveReq{ {}, req.time };
   reserveParkingSpace(reserveReq);
 }
 
-void AccountServiceImpl::onExit(const Domain::ExitRequest &req)
+void ParkingSpaceManagerImpl::onExit(const Domain::ExitRequest &req)
 {
   const Domain::ReleasingRequest releaseReq{ req.vehicleNumber, req.time };
   releaseParkingSpace(releaseReq);
 }
 
 
-}// namespace Vertaler::ParkingSystem::BL::AccountService
+}// namespace Vertaler::ParkingSystem::BL::ParkingSpaceManager

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BusinessLogic/AccountService/Public/Interface.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/Interface.h"
 #include "BusinessLogic/PaymentService/Public/Interface.h"
 #include "BusinessLogic/PriceCalculator/Public/Interface.h"
 
@@ -16,7 +16,7 @@ namespace Vertaler::ParkingSystem::BL::PaymentService
 class PaymentServiceImpl : public Interface
 {
 public:
-  PaymentServiceImpl(PriceCalculator::Interface &priceCalculator, AccountService::Interface &accountService);
+  PaymentServiceImpl(PriceCalculator::Interface &priceCalculator, ParkingSpaceManager::Interface &parkingSpaceManager);
 
   Cmn::Result<Domain::PaymentTicketID> registerNewReservation(const Domain::ReservationTicket &ticket) override;
   Cmn::Result<bool> needPay(const Domain::PaymentTicketID &ticketID) const override;
@@ -27,7 +27,7 @@ private:
   std::unordered_set<Domain::PaymentTicketID> _tickets;
   std::unordered_map<Domain::PaymentTicketID, Domain::PaymentTicket> _unpdaidTickets;
 
-  AccountService::Interface &_accountService;
+  ParkingSpaceManager::Interface &_parkingSpaceManager;
   PriceCalculator::Interface &_priceCalculator;
 };
 

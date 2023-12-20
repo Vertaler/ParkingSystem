@@ -1,9 +1,9 @@
-#include "BusinessLogic/AccountService/Public/Factory.h"
-#include "BusinessLogic/AccountService/Public/Interface.h"
 #include "BusinessLogic/BarrierController/Public/Factory.h"
 #include "BusinessLogic/BarrierController/Public/Interface.h"
 #include "BusinessLogic/EntryExitController/Public/Factory.h"
 #include "BusinessLogic/EntryExitController/Public/Interface.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/Factory.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/Interface.h"
 #include "BusinessLogic/PaymentService/Public/Factory.h"
 #include "BusinessLogic/PaymentService/Public/Interface.h"
 #include "BusinessLogic/PriceCalculator/Public/Factory.h"
@@ -77,12 +77,12 @@ try
   const auto hardware = Hardware::createFacade(std::cout, std::cin);
   const auto priceCalculator = BL::PriceCalculator::create();
   const auto vehicleCatalog = BL::VehicleCatalog::create();
-  const auto accountService = BL::AccountService::create();
-  const auto paymentService = BL::PaymentService::create(*priceCalculator, *accountService);
+  const auto parkingSpaceManager = BL::ParkingSpaceManager::create();
+  const auto paymentService = BL::PaymentService::create(*priceCalculator, *parkingSpaceManager);
   const auto entryExitController = BL::EntryExitController::create(*paymentService, *vehicleCatalog);
 
   // TODO: Obserser should register itself
-  entryExitController->registerObserver(*accountService);
+  entryExitController->registerObserver(*parkingSpaceManager);
 
   BarrierControllers inputBarrierControllers;
   BarrierControllers outputBarrierControllers;

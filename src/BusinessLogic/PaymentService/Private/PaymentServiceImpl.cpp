@@ -1,6 +1,6 @@
 #include "PaymentServiceImpl.h"
 
-#include "BusinessLogic/AccountService/Public/Errors.h"
+#include "BusinessLogic/ParkingSpaceManager/Public/Errors.h"
 #include "BusinessLogic/PaymentService/Public/Errors.h"
 
 #include "Common/Error.h"
@@ -25,8 +25,8 @@ namespace
 }// namespace
 
 PaymentServiceImpl::PaymentServiceImpl(PriceCalculator::Interface &priceCalculator,
-  AccountService::Interface &accountService)
-  : _priceCalculator(priceCalculator), _accountService(accountService)
+  ParkingSpaceManager::Interface &parkingSpaceManager)
+  : _priceCalculator(priceCalculator), _parkingSpaceManager(parkingSpaceManager)
 {}
 
 Cmn::Result<Domain::PaymentTicketID> PaymentServiceImpl::registerNewReservation(const Domain::ReservationTicket &ticket)
@@ -56,10 +56,10 @@ Cmn::Result<Domain::PaymentTicketOpt> PaymentServiceImpl::getPayment(const Domai
     return Domain::PaymentTicketOpt{ iter->second };
   }
 
-  auto parkingReservation = _accountService.getParkingReservation(req.vehicleNumber);
+  auto parkingReservation = _parkingSpaceManager.getParkingReservation(req.vehicleNumber);
   if (auto *err = parkingReservation.getError(); err != nullptr)
   {
-    if (err->is(AccountService::Errc::ReservationNotFound))
+    if (err->is(ParkingSpaceManager::Errc::ReservationNotFound))
     {
       // TODO log this;
       return Domain::PaymentTicketOpt{};
